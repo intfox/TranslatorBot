@@ -18,36 +18,36 @@ module.exports = class Telegram {
 
         this.bot.onText(/^\/create$/, (msg) => {
             const chatId = msg.chat.id
-            _errorHandling(chatId, dialogsService.create({id: chatId, username: msg.from.username}).then(dialogId => {
+            dialogsService.create({id: chatId, username: msg.from.username}).then(dialogId => {
                 this.bot.sendMessage(chatId, `bot: that dialog id:`)
                 this.bot.sendMessage(chatId, dialogId)
-            }))
+            }).catch(this._errorHandling(chatId))
         })
 
         this.bot.onText(/^\/join ([A-z, 0-9]{8})$/, (msg, arr) => {
             const dialogId = arr[1]
-            _errorHandling(msg.chat.id, dialogsService.join({id: msg.chat.id, username: msg.from.username}, dialogId).then(arrUsers => {
+            dialogsService.join({id: msg.chat.id, username: msg.from.username}, dialogId).then(arrUsers => {
                 console.log(`arrUsers: ${JSON.stringify(arrUsers)}`)
                 arrUsers.forEach(user => {
                     this.bot.sendMessage(user.id, `bot: @${msg.from.username} joined`)
                 })
                 this.bot.sendMessage(msg.chat.id, 'bot: joined successed')
-            }))
+            }).catch(this._errorHandling(msg.chat.id))
         })
 
         this.bot.onText(/^\/setLanguage (.*)$/, (msg, arr) => {
             const language = arr[1]
-            _errorHandling(msg.chat.id, translateService.supportedLanguage().then( supportedLanguages => {
+            translateService.supportedLanguage().then( supportedLanguages => {
                 if(supportedLanguages.includes(language)) {
                     userSettingService.setLanguage(msg.chat.id, language)
                 } else {
                     this.bot.sendMessage(msg.chat.id, 'bot: this language not supported')
                 }
-            }))
+            }).catch(this._errorHandling(msg.chat.id))
         })
 
         this.bot.onText(/^[^\/]./, msg => {
-            _errorHandling(msg.chat.id, dialogsService.getDialogFromUserId(msg.chat.id).then(dialog =>
+            dialogsService.getDialogFromUserId(msg.chat.id).then(dialog =>
                 userSettingService.getLanguage(msg.chat.id).then(languageSender => {
                     dialog.users.forEach(user => {
                         if(user.id != msg.chat.id) userSettingService.getLanguage(user.id).then(language => {
@@ -57,17 +57,17 @@ module.exports = class Telegram {
                         })
                     })
                 })
-            ))
+            ).catch(this._errorHandling(msg.chat.id))
         })
     }
 
-    _errorHandling(chatId, promise) {
-        return promise.catch(err => {
+    _errorHandling(chatId) {
+        return err => {
             if(err instanceof LogicError) {
                 this.bot.sendMessage(chatId, `bot: ${err.message}`)
             } else {
                 console.error(`err: ${err.name} ${err.message}`)
             }
-        })
+        }
     }
 }

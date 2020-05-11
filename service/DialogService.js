@@ -14,7 +14,7 @@ module.exports = class DialogService{
         }
         return this.userStorage.get(user.id)
         .then(
-            () => Promise.reject(LogicError('You are already in dialogue')), 
+            () => Promise.reject(new LogicError('You are already in dialogue')), 
             () => this.dialogStorage.create(randomString))
         .then(() => this.join(user, randomString))
         .then(() => randomString)
@@ -23,7 +23,7 @@ module.exports = class DialogService{
     join(user, dialogId) {
         return this.userStorage.get(user.id)
         .then(
-            () => Promise.reject(LogicError('You are already in dialogue')), 
+            () => Promise.reject(new LogicError('You are already in dialogue')), 
             () => this.dialogStorage.get(dialogId))
         .then(dialog => {
             const otherUsers = dialog.users.slice()
