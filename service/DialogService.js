@@ -1,3 +1,5 @@
+const { LogicError } = require('../model/error')
+
 module.exports = class DialogService{
     constructor(dialogStorage, userStorage) {
         this.dialogStorage = dialogStorage
@@ -10,13 +12,20 @@ module.exports = class DialogService{
         for(let i = 0; i < 8; i++) {
             randomString += allCharacter[Math.floor(Math.random() * allCharacter.length)]
         }
-        return this.dialogStorage.create(randomString)
-            .then(() => this.join(user, randomString))
-            .then(() => randomString)
+        return this.userStorage.get(user.id)
+        .then(
+            () => Promise.reject(new LogicError('You are already in dialogue')), 
+            () => this.dialogStorage.create(randomString))
+        .then(() => this.join(user, randomString))
+        .then(() => randomString)
     }
 
     join(user, dialogId) {
-        return this.dialogStorage.get(dialogId).then(dialog => {
+        return this.userStorage.get(user.id)
+        .then(
+            () => Promise.reject(new LogicError('You are already in dialogue')), 
+            () => this.dialogStorage.get(dialogId))
+        .then(dialog => {
             const otherUsers = dialog.users.slice()
             dialog.users.push(user)
             return this.dialogStorage.update(dialogId, { users: dialog.users } ).then(() => {

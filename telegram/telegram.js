@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api')
+const { LogicError } = require('../model/error')
 
 module.exports = class Telegram {
     constructor(config, dialogsService, translateService, userSettingService) {
@@ -20,7 +21,7 @@ module.exports = class Telegram {
             dialogsService.create({id: chatId, username: msg.from.username}).then(dialogId => {
                 this.bot.sendMessage(chatId, `bot: that dialog id:`)
                 this.bot.sendMessage(chatId, dialogId)
-            })
+            }).catch(this._errorHandling(chatId))
         })
 
         this.bot.onText(/^\/join ([A-z, 0-9]{8})$/, (msg, arr) => {
@@ -31,7 +32,7 @@ module.exports = class Telegram {
                     this.bot.sendMessage(user.id, `bot: @${msg.from.username} joined`)
                 })
                 this.bot.sendMessage(msg.chat.id, 'bot: joined successed')
-            })
+            }).catch(this._errorHandling(msg.chat.id))
         })
 
         this.bot.onText(/^\/setLanguage (.*)$/, (msg, arr) => {
@@ -42,7 +43,7 @@ module.exports = class Telegram {
                 } else {
                     this.bot.sendMessage(msg.chat.id, 'bot: this language not supported')
                 }
-            })
+            }).catch(this._errorHandling(msg.chat.id))
         })
 
         this.bot.onText(/^[^\/]./, msg => {
@@ -56,7 +57,17 @@ module.exports = class Telegram {
                         })
                     })
                 })
-            )
+            ).catch(this._errorHandling(msg.chat.id))
         })
+    }
+
+    _errorHandling(chatId) {
+        return err => {
+            if(err instanceof LogicError) {
+                this.bot.sendMessage(chatId, `bot: ${err.message}`)
+            } else {
+                console.error(`err: ${err.name} ${err.message}`)
+            }
+        }
     }
 }
