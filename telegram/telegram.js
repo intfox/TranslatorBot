@@ -8,6 +8,13 @@ module.exports = class Telegram {
         this.translateService = translateService
         this.userSettingService = userSettingService
 
+        this.bot.onText(/^\/start$/, (msg) => {
+            this.bot.sendMessage(msg.chat.id, '/create - create dialog\n'
+            + '/join <id> - join to dialog\n'
+            + '/setLanguage <language> - set your language\n'
+            + '/leave - leave from dialog')
+        })
+
         this.bot.onText(/^\/create$/, (msg) => {
             const chatId = msg.chat.id
             dialogsService.create({id: chatId, username: msg.from.username}).then(dialogId => {
