@@ -31,16 +31,13 @@ module.exports = class Telegram {
 
         this.bot.onText(/^\/setLanguage (.)$/, (msg, arr) => {
             const language = arr[1]
-            switch(language) {
-                case 'ru': 
-                    userSettingService.setLanguage(msg.chat.id, 'ru')
-                    break
-                case 'en':
-                    userSettingService.setLanguage(msg.chat.id, 'en')
-                    break
-                default:
+            translateService.supportedLanguage().then( supportedLanguages => {
+                if(supportedLanguages.includes(language)) {
+                    userSettingService.setLanguage(msg.chat.id, language)
+                } else {
                     this.bot.sendMessage(msg.chat.id, 'bot: this language not supported')
-            }
+                }
+            })
         })
 
         this.bot.onText(/^[^\/]./, msg => {
