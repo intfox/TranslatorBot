@@ -10,12 +10,10 @@ module.exports = class Telegram {
 
         this.bot.onText(/^\/create$/, (msg) => {
             const chatId = msg.chat.id
-            dialogsService.create().then(dialogId => 
-                dialogsService.join({id: chatId, username: msg.from.username}, dialogId).then(() => {
-                    this.bot.sendMessage(chatId, `bot: that dialog id:`)
-                    this.bot.sendMessage(chatId, dialogId)
-                })
-            )
+            dialogsService.create({id: chatId, username: msg.from.username}).then(dialogId => {
+                this.bot.sendMessage(chatId, `bot: that dialog id:`)
+                this.bot.sendMessage(chatId, dialogId)
+            })
         })
 
         this.bot.onText(/^\/join ([A-z, 0-9]{8})$/, (msg, arr) => {

@@ -4,13 +4,15 @@ module.exports = class DialogService{
         this.userStorage = userStorage
     }
 
-    create() {
+    create(user) {
         const allCharacter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         let randomString = ''
         for(let i = 0; i < 8; i++) {
             randomString += allCharacter[Math.floor(Math.random() * allCharacter.length)]
         }
-        return this.dialogStorage.create(randomString).then(() => randomString)
+        return this.dialogStorage.create(randomString)
+            .then(() => this.join(user, randomString))
+            .then(() => randomString)
     }
 
     join(user, dialogId) {
