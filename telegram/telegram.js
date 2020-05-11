@@ -27,7 +27,7 @@ module.exports = class Telegram {
             })
         })
 
-        this.bot.onText(/^\/setLanguage (.)$/, (msg, arr) => {
+        this.bot.onText(/^\/setLanguage (.*)$/, (msg, arr) => {
             const language = arr[1]
             translateService.supportedLanguage().then( supportedLanguages => {
                 if(supportedLanguages.includes(language)) {
@@ -43,7 +43,7 @@ module.exports = class Telegram {
                 userSettingService.getLanguage(msg.chat.id).then(languageSender => {
                     dialog.users.forEach(user => {
                         if(user.id != msg.chat.id) userSettingService.getLanguage(user.id).then(language => {
-                            translateService.translate(msg.text, from=languageSender, to=language).then(message => { //????wtf error: from is not defined
+                            translateService.translate(msg.text, languageSender, language).then(message => { //????wtf error: from is not defined
                                 this.bot.sendMessage(user.id, `@${user.username}: ${message}`)
                             })
                         })
