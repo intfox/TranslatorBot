@@ -29,6 +29,15 @@ class LocalStorage{
         })
     }
 
+    delete(id) {
+        return new Promise((resolve, reject) => {
+            if(this.storage.hasOwnProperty(id)) {
+                delete this.storage[id]
+                resolve()
+            } else reject(new Error('Not Found'))
+        })
+    }
+
     _clearObject() { return new Object() }
 
     _deepCopy(obj) { return JSON.parse(JSON.stringify(obj)) }

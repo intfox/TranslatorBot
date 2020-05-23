@@ -40,5 +40,14 @@ module.exports = class DialogService{
         })
     }
 
-    leave(userId) { } //todo
+    leave(userId) { 
+        return this.userStorage.get(userId).then(dialogId => {
+            return this.dialogStorage.get(dialogId)
+                .then(dialog => {
+                    const otherUsers = dialog.users.filter(user => user.id != userId)
+                    if(otherUsers.length == 0) return this.dialogStorage.delete(dialogId)
+                    else return this.dialogStorage.update(dialogId, { users: otherUsers })
+                })
+        }).then(() => this.userStorage.delete(userId))
+    }
 }
