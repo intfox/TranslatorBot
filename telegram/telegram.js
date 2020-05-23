@@ -47,8 +47,11 @@ module.exports = class Telegram {
         })
 
         this.bot.onText(/^\/leave$/, msg => {
-            this.dialogsService.leave(msg.chat.id).then(() => {
-                this.bot.sendMessage(msg.chat.id, 'bot: leave ok')
+            this.dialogsService.leave(msg.chat.id).then(arrUsers => {
+                this.bot.sendMessage(msg.chat.id, 'bot: leave successed')
+                arrUsers.forEach(user => {
+                    this.bot.sendMessage(user.id, `bot: @${msg.from.username} leave`)
+                })
             }).catch(this._errorHandling(msg.chat.id))
         })
 
