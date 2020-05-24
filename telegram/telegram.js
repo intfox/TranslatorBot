@@ -61,7 +61,7 @@ module.exports = class Telegram {
                     dialog.users.forEach(user => {
                         if(user.id != msg.chat.id) userSettingService.getLanguage(user.id).then(language => {
                             translateService.translate(msg.text, languageSender, language).then(message => { //????wtf error: from is not defined
-                                this.bot.sendMessage(user.id, `@${user.username}: ${message}`)
+                                this.bot.sendMessage(user.id, `@${msg.from.username}: ${message}`)
                             })
                         })
                     })
