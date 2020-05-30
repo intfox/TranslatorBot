@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "bot.js",
   "dependencies": {
+    "mongodb": "^3.5.7",
     "node-telegram-bot-api": "^0.40.0"
   }
 }
