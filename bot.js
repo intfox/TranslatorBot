@@ -6,9 +6,10 @@ const { LocalStorage, DialogLocalStorage } = require('./storage/LocalStorage')
 const { MongoStorage, DialogMongoStorage } = require('./storage/MongoStorage')
 const UserSettingService = require('./service/UserSettingService')
 const Config = require('./config/config')
+const config = new Config()
 
 const app = new Telegram(
-    new Config(),
+    config.telegram,
     dialogService=new DialogService(dialogStorage = new DialogMongoStorage('UserDialogs'), new MongoStorage('Users')),
-    translateService=new TranslateServiceMock(),
+    translateService=new TranslateService(config.yandex_translate),
     userSettingService=new UserSettingService(new MongoStorage('UserSettings')))

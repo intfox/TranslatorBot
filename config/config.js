@@ -1,6 +1,7 @@
 module.exports = class Config {
     constructor() {
         const secrets = require('../secrets.json')
-        this.token = secrets.token
+        this.telegram = secrets.telegram
+        this.yandex_translate = secrets.yandex_translate
     }
 }
