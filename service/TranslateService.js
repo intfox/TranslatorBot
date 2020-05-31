@@ -28,7 +28,7 @@ module.exports = {
         }
 
         supportedLanguage() {
-            return ['en', 'ru', 'uk']
+            return Promise.resolve(['en', 'ru', 'uk'])
         }
     },
     TranslateServiceMock: class TranslateServiceMock {
