@@ -10,10 +10,12 @@ module.exports = class Telegram {
         this.userSettingService = userSettingService
 
         this.bot.onText(/^\/start$/, (msg) => {
-            this.bot.sendMessage(msg.chat.id, '/create - create dialog\n'
-            + '/join <id> - join to dialog\n'
-            + '/setLanguage <language> - set your language\n'
-            + '/leave - leave from dialog')
+            this.bot.sendMessage(msg.chat.id, 
+                '/create - create dialog\n'
+                + '/join <id> - join to dialog\n'
+                + '/setLanguage <language> - set your language\n'
+                + '/leave - leave from dialog\n'
+                + '/translate <language from> <language to> <text> - translate')
         })
 
         this.bot.onText(/^\/create$/, (msg) => {
@@ -60,13 +62,23 @@ module.exports = class Telegram {
                 userSettingService.getLanguage(msg.chat.id).then(languageSender => {
                     dialog.users.forEach(user => {
                         if(user.id != msg.chat.id) userSettingService.getLanguage(user.id).then(language => {
-                            translateService.translate(msg.text, languageSender, language).then(message => { //????wtf error: from is not defined
+                            translateService.translate(msg.text, languageSender, language).then(message => {
                                 this.bot.sendMessage(user.id, `@${msg.from.username}: ${message}`)
                             })
                         })
                     })
                 })
             ).catch(this._errorHandling(msg.chat.id))
+        })
+
+        this.bot.onText(/^\/translate (.{2}) (.{2}) (.*)$/, (msg, arr) => {
+            translateService.supportedLanguage().then( supportedLanguage => {
+                if(supportedLanguage.includes(arr[1]) && supportedLanguage.includes(arr[2])) {
+                    translateService.translate(arr[3], arr[1], arr[2]).then(text => {
+                        this.bot.sendMessage(msg.chat.id, `bot: ${text}`)
+                    })
+                } else throw new LogicError('language not suported')
+            }).catch(this._errorHandling(msg.chat.id))
         })
     }
 
